@@ -1,0 +1,1 @@
+API POSTMAN = "[https://api.postman.com/collections/25349329-491cf503-dd4b-4de3-bda6-638ffe3ae9b4?access_key=PMAT-01JCD0E0KCDJTR906T3NSCFF1G](https://www.postman.com/research-technologist-30996979/inventory/request/dwluutf/add)" 
