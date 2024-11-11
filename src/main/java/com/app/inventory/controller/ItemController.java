@@ -2,6 +2,7 @@ package com.app.inventory.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +36,8 @@ public class ItemController {
 	}
 	
 
-	@PostMapping(value = "/item")
+	@PostMapping(value = "/item", consumes = MediaType.APPLICATION_JSON_VALUE,
+		      produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<WebResponse<String>> add(@Valid @RequestBody CreateItemRequest request) {
 		service.add(request);
 		return ResponseEntity.ok(ResponseHelper.ok(PROP_ITEM + ErrorMessageConstant.HAS_BEEN_ADDED_SUCCESSFULLY));
@@ -53,12 +55,12 @@ public class ItemController {
 		return ResponseEntity.ok(ResponseHelper.ok(PROP_ITEM + ErrorMessageConstant.HAS_BEEN_DELETED_SUCCESSFULLY));
 	}
 
-	@GetMapping(value = "/item/{id}")
+	@GetMapping(value = "/item/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<WebResponse<ItemResponse>> getById(@PathVariable Long id) {
 		return ResponseEntity.ok(ResponseHelper.ok(service.getById(id)));
 	}
 
-	@GetMapping(value = "/item")
+	@GetMapping(value = "/item", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<WebResponse<Page<ItemResponse>>> getAllItems(Pageable pageable) {
 		return ResponseEntity.ok(ResponseHelper.ok(service.getAllItems(pageable)));
 	}

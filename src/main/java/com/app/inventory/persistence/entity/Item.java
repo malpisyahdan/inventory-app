@@ -11,10 +11,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @SuppressWarnings("deprecation")
 @Entity
-@Table(name = "item")
+@Table(name = "item", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "deleted_at"})})
 @SQLDelete(sql = "UPDATE item SET deleted_at = now() WHERE id=? AND version =?")
 @Where(clause = "deleted_at IS NULL")
 public class Item extends MasterEntity {

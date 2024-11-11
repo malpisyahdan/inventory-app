@@ -28,14 +28,14 @@ import jakarta.validation.ValidationException;
 public class ItemServiceImpl implements ItemService {
 
 	private final ItemRepository repository;
-	private final InventoryService inventoryService;
+	private InventoryService inventoryService;
 
 	public ItemServiceImpl(ItemRepository repository, @Lazy InventoryService inventoryService) {
 		this.repository = repository;
 		this.inventoryService = inventoryService;
 	}
 
-	public void validateBkNotExist(CreateItemRequest request) {
+	private void validateBkNotExist(CreateItemRequest request) {
 		if (repository.existsByName(request.getName())) {
 			throw new ValidationException("item with " + request.getName() + ErrorMessageConstant.IS_EXISTS);
 		}
@@ -44,8 +44,8 @@ public class ItemServiceImpl implements ItemService {
 	@Transactional
 	@Override
 	public void add(CreateItemRequest request) {
-		Item entity = new Item();
 		validateBkNotExist(request);
+		Item entity = new Item();
 		mapToEntity(entity, request);
 		repository.save(entity);
 
