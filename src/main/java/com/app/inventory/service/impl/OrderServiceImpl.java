@@ -5,7 +5,9 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.app.inventory.error.ErrorMessageConstant;
 import com.app.inventory.model.request.CreateOrderRequest;
@@ -18,7 +20,6 @@ import com.app.inventory.service.ItemService;
 import com.app.inventory.service.OrderService;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.ValidationException;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -37,7 +38,8 @@ public class OrderServiceImpl implements OrderService {
 	public void validateBkNotNull(CreateOrderRequest request) {
 
 		itemService.getEntityById(request.getItemId())
-				.orElseThrow(() -> new ValidationException("item id " + ErrorMessageConstant.IS_NOT_EXISTS));
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+						"item id " + ErrorMessageConstant.IS_NOT_EXISTS));
 	}
 
 	@Transactional
@@ -54,10 +56,10 @@ public class OrderServiceImpl implements OrderService {
 
 		if (lastOrder.isPresent()) {
 			String lastOrderNo = lastOrder.get().getOrderNo();
-			int lastOrderNumber = Integer.parseInt(lastOrderNo.substring(1)); // Strip the "Q" and parse the number
+			int lastOrderNumber = Integer.parseInt(lastOrderNo.substring(1));
 			return "Q" + (lastOrderNumber + 1);
 		} else {
-			return "Q1"; // Start from Q1 if no order exists
+			return "Q1";
 		}
 	}
 
@@ -69,7 +71,7 @@ public class OrderServiceImpl implements OrderService {
 			mapToEntity(entity, request);
 			repository.save(entity);
 		}, () -> {
-			throw new RuntimeException("id item " + ErrorMessageConstant.IS_NOT_EXISTS);
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "id item " + ErrorMessageConstant.IS_NOT_EXISTS);
 		});
 
 	}
@@ -80,7 +82,7 @@ public class OrderServiceImpl implements OrderService {
 		getEntityById(id).ifPresentOrElse(entity -> {
 			repository.deleteById(id);
 		}, () -> {
-			throw new RuntimeException("id item" + ErrorMessageConstant.IS_NOT_EXISTS);
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "id item" + ErrorMessageConstant.IS_NOT_EXISTS);
 		});
 
 	}
@@ -92,8 +94,8 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public OrderResponse getById(String id) {
-		Order entity = getEntityById(id)
-				.orElseThrow(() -> new RuntimeException("item(s) " + ErrorMessageConstant.NOT_FOUND));
+		Order entity = getEntityById(id).orElseThrow(
+				() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "item(s) " + ErrorMessageConstant.NOT_FOUND));
 		return mapToResponse(entity);
 	}
 
@@ -129,7 +131,7 @@ public class OrderServiceImpl implements OrderService {
 		response.setItemName(entity.getItem().getName());
 		response.setQty(entity.getQty());
 		response.setPrice(entity.getPrice());
-		
+
 		response.setCreatedAt(entity.getCreatedAt());
 		response.setUpdatedAt(entity.getUpdatedAt());
 		response.setVersion(entity.getVersion());

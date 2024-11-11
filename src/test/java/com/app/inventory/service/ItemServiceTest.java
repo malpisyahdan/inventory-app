@@ -28,8 +28,6 @@ import com.app.inventory.persistence.entity.Item;
 import com.app.inventory.persistence.repository.ItemRepository;
 import com.app.inventory.service.impl.ItemServiceImpl;
 
-import jakarta.validation.ValidationException;
-
 @ExtendWith(MockitoExtension.class)
 public class ItemServiceTest {
 
@@ -80,7 +78,7 @@ public class ItemServiceTest {
 		try {
 			itemService.add(createItemRequest);
 		} catch (Exception e) {
-			assert (e instanceof ValidationException);
+			assert (e instanceof ResponseStatusException);
 			assert (e.getMessage().contains("item with Item 1 is exists"));
 		}
 	}

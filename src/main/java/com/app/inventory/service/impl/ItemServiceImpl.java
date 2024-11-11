@@ -22,7 +22,6 @@ import com.app.inventory.service.InventoryService;
 import com.app.inventory.service.ItemService;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.ValidationException;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -37,7 +36,8 @@ public class ItemServiceImpl implements ItemService {
 
 	private void validateBkNotExist(CreateItemRequest request) {
 		if (repository.existsByName(request.getName())) {
-			throw new ValidationException("item with " + request.getName() + ErrorMessageConstant.IS_EXISTS);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+					"item with " + request.getName() + ErrorMessageConstant.IS_EXISTS);
 		}
 	}
 
@@ -58,7 +58,7 @@ public class ItemServiceImpl implements ItemService {
 			mapToEntity(entity, request);
 			repository.save(entity);
 		}, () -> {
-			throw new RuntimeException("id item " + ErrorMessageConstant.IS_NOT_EXISTS);
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "id item " + ErrorMessageConstant.IS_NOT_EXISTS);
 		});
 
 	}

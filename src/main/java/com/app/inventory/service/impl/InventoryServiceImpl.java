@@ -20,7 +20,6 @@ import com.app.inventory.service.InventoryService;
 import com.app.inventory.service.ItemService;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.ValidationException;
 
 @Service
 public class InventoryServiceImpl implements InventoryService {
@@ -37,7 +36,8 @@ public class InventoryServiceImpl implements InventoryService {
 	public void validateBkNotNull(CreateInventoryRequest request) {
 
 		itemService.getEntityById(request.getItemId())
-				.orElseThrow(() -> new ValidationException("item id " + ErrorMessageConstant.IS_NOT_EXISTS));
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+						"item id " + ErrorMessageConstant.IS_NOT_EXISTS));
 	}
 
 	@Transactional
@@ -58,7 +58,7 @@ public class InventoryServiceImpl implements InventoryService {
 			mapToEntity(entity, request);
 			repository.save(entity);
 		}, () -> {
-			throw new RuntimeException("id item " + ErrorMessageConstant.IS_NOT_EXISTS);
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "id item " + ErrorMessageConstant.IS_NOT_EXISTS);
 		});
 
 	}
@@ -69,7 +69,7 @@ public class InventoryServiceImpl implements InventoryService {
 		getEntityById(id).ifPresentOrElse(entity -> {
 			repository.deleteById(id);
 		}, () -> {
-			throw new RuntimeException("id item" + ErrorMessageConstant.IS_NOT_EXISTS);
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "id item" + ErrorMessageConstant.IS_NOT_EXISTS);
 		});
 
 	}
@@ -80,7 +80,7 @@ public class InventoryServiceImpl implements InventoryService {
 		List<Inventory> inventories = getEntityByItemId(itemId);
 
 		if (inventories.isEmpty()) {
-			throw new RuntimeException("No stock available for item");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No stock available for item");
 		}
 
 		for (Inventory inv : inventories) {
@@ -99,7 +99,7 @@ public class InventoryServiceImpl implements InventoryService {
 			}
 		}
 
-		throw new RuntimeException("Not enough stock available for item");
+		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not enough stock available for item");
 	}
 
 	@Override
@@ -140,7 +140,6 @@ public class InventoryServiceImpl implements InventoryService {
 		response.setCreatedAt(entity.getCreatedAt());
 		response.setUpdatedAt(entity.getUpdatedAt());
 		response.setVersion(entity.getVersion());
-		
 
 		return response;
 	}

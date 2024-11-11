@@ -33,8 +33,6 @@ import com.app.inventory.persistence.entity.Item;
 import com.app.inventory.persistence.repository.InventoryRepository;
 import com.app.inventory.service.impl.InventoryServiceImpl;
 
-import jakarta.validation.ValidationException;
-
 class InventoryServiceTest {
 
 	@Mock
@@ -80,11 +78,11 @@ class InventoryServiceTest {
 
 		when(itemService.getEntityById((long) 1)).thenReturn(Optional.empty());
 
-		ValidationException exception = assertThrows(ValidationException.class, () -> {
+		ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
 			inventoryService.add(request);
 		});
 
-		assertEquals("item id is not exists", exception.getMessage());
+		assertEquals("404 NOT_FOUND \"item id is not exists\"", exception.getMessage());
 	}
 
 	@Test
@@ -122,11 +120,11 @@ class InventoryServiceTest {
 
 		when(inventoryRepository.findById((long) 1)).thenReturn(Optional.empty());
 
-		RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+		ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
 			inventoryService.edit(request);
 		});
 
-		assertEquals("id item is not exists", exception.getMessage());
+		assertEquals("404 NOT_FOUND \"id item is not exists\"", exception.getMessage());
 	}
 
 	@Test
@@ -149,11 +147,11 @@ class InventoryServiceTest {
 
 		when(inventoryRepository.findById(inventoryId)).thenReturn(Optional.empty());
 
-		RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+		ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
 			inventoryService.delete(inventoryId);
 		});
 
-		assertEquals("id itemis not exists", exception.getMessage());
+		assertEquals("404 NOT_FOUND \"id itemis not exists\"", exception.getMessage());
 	}
 
 	@Test
@@ -194,11 +192,11 @@ class InventoryServiceTest {
 		List<Inventory> inventories = Collections.singletonList(inventory1);
 		when(inventoryRepository.findAllByItemId(itemId)).thenReturn(inventories);
 
-		RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+		ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
 			inventoryService.changeTotalStock(itemId, qtyToReduce);
 		});
 
-		assertEquals("Not enough stock available for item", exception.getMessage());
+		assertEquals("400 BAD_REQUEST \"Not enough stock available for item\"", exception.getMessage());
 	}
 
 	@Test

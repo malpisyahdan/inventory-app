@@ -29,8 +29,6 @@ import com.app.inventory.persistence.entity.Order;
 import com.app.inventory.persistence.repository.OrderRepository;
 import com.app.inventory.service.impl.OrderServiceImpl;
 
-import jakarta.validation.ValidationException;
-
 public class OrderServiceTest {
 
 	@Mock
@@ -83,7 +81,7 @@ public class OrderServiceTest {
 
 		when(itemService.getEntityById((long) 1)).thenReturn(Optional.empty());
 
-		assertThrows(ValidationException.class, () -> orderService.add(request));
+		assertThrows(ResponseStatusException.class, () -> orderService.add(request));
 	}
 
 	@Test
